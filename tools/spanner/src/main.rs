@@ -17,6 +17,7 @@ async fn handler(event: Value, _: Context) -> Result<Value, Error> {
     let first_name = event["firstName"].as_str().unwrap_or("Anonymous");
     
     println!("{}", env::var("AWS_LAMBDA_FUNCTION_NAME").is_err());
+    println("{}", event);
     
     let response = format!("Hello, {}! Your nom de jour  is {}", message,  env::var("AWS_LAMBDA_FUNCTION_NAME").is_err());
     log::info!("{}", response);
