@@ -18,7 +18,7 @@ export class MlMechanicStack extends Stack {
         architecture: lambda.Architecture.ARM_64,
         environment: {
             RUST_BACKTRACE: '1',
-        },
+        } ,
         logRetention: RetentionDays.ONE_WEEK,
     });
   }
