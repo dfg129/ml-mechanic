@@ -28,14 +28,9 @@ export class MlMechanicStack extends Stack {
         environment: {
             RUST_BACKTRACE: '1',
         } ,
+
         logRetention: RetentionDays.ONE_WEEK,
     });
-
-    bucket.grantRead(fn);
-    fn.addEventSource(
-        new eventsources.S3EventSource(bucket, {
-            events: [s3.EventType.OBJECT_CREATED],
-        }),
-    );
+    bucket.addEventNotification(s3.EventType.OBJECT_CREATED, new s3n.LambdaDestination(fn));
   }
 }
