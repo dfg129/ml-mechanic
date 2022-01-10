@@ -18,11 +18,11 @@ export class MlMechanicStack extends Stack {
         enforceSSL: true,
     });
 
-    let docker_dir = path.join(__dirname, '../tools/spanner');
+    let docker_dir = path.join(__dirname, '../tools/dataverse');
     
     let fn = new lambda.DockerImageFunction(this, 'rust-hello', {
         description: 
-            'Rust on lambda, using arm!',
+            'Rust on lambda, using arm',
         code: lambda.DockerImageCode.fromImageAsset( docker_dir ), 
         architecture: lambda.Architecture.ARM_64,
         environment: {

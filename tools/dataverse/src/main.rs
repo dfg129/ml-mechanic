@@ -91,7 +91,7 @@ async fn main() -> Result<(), Error> {
     let shared_config = aws_config::from_env().region(region_provider).load().await;
     let client = Client::new(&shared_config);
 
-    create_table(&client, &table, &key).await;
+    create_table(&client, &table, &key).await.unwrap();
 
     let req = client.list_tables().limit(10);
     let resp = req.send().await?;
