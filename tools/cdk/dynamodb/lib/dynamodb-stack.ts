@@ -8,7 +8,7 @@ import * as eventsources from 'aws-cdk-lib/aws-lambda-event-sources';
 import * as path from 'path';
 
 
-export class MlMechanicStack extends Stack {
+export class DynamodbStack extends Stack {
   constructor(scope: Construct, id: string, props?: StackProps) {
     super(scope, id, props);
 
@@ -18,11 +18,11 @@ export class MlMechanicStack extends Stack {
         enforceSSL: true,
     });
 
-    let docker_dir = path.join(__dirname, '../tools/dataverse');
+    let docker_dir = path.join(__dirname, '../../../sls/dynamodb');
     
-    let fn = new lambda.DockerImageFunction(this, 'rust-hello', {
+    let fn = new lambda.DockerImageFunction(this, 'rust-dynamodb', {
         description: 
-            'Rust on lambda, using arm',
+            'Rust on lambda with dynamodb',
         code: lambda.DockerImageCode.fromImageAsset( docker_dir ), 
         architecture: lambda.Architecture.ARM_64,
         environment: {
