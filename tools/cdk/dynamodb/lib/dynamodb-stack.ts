@@ -1,5 +1,7 @@
 import { Stack, StackProps, RemovalPolicy } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
+import { Vpc, SubnetType } from 'aws-cdk-lib/aws-ec2';
+import { Policy, PolicyStatement } from 'aws-cdk-lib/aws-iam';
 import * as lambda from 'aws-cdk-lib/aws-lambda';
 import { RetentionDays } from 'aws-cdk-lib/aws-logs';
 import * as s3 from 'aws-cdk-lib/aws-s3';
@@ -19,7 +21,22 @@ export class DynamodbStack extends Stack {
     });
 
     let docker_dir = path.join(__dirname, '../../../sls/dynamodb');
-    
+
+    let vpc = Vpc.fromLookup(this, "cafe-vpc", { vpcName: 'cafe-vpc' });
+
+    const dynamodb_policy = new PolicyStatement({
+        actions: [
+                "dynamodb:BatchGetItem",
+				"dynamodb:GetItem",
+				"dynamodb:Query",
+				"dynamodb:Scan",
+				"dynamodb:BatchWriteItem",
+				"dynamodb:PutItem",
+				"dynamodb:UpdateItem"
+        ],
+        resources: ["arn:aws:dynamodb:us-east-1:111222333999:table:t123"],
+    });
+
     let fn = new lambda.DockerImageFunction(this, 'rust-dynamodb', {
         description: 
             'Rust on lambda with dynamodb',
@@ -28,9 +45,16 @@ export class DynamodbStack extends Stack {
         environment: {
             RUST_BACKTRACE: '1',
         } ,
-
+        vpc: vpc,
+        vpcSubnets: { subnetType: SubnetType.PRIVATE_WITH_NAT },
         logRetention: RetentionDays.ONE_WEEK,
     });
     bucket.addEventNotification(s3.EventType.OBJECT_CREATED, new s3n.LambdaDestination(fn));
+
+    fn.role?.attachInlinePolicy(
+        new Policy(this, 'dynamodb-policy', {
+            statements: [dynamodb_policy],
+        }),
+    );
   }
 }
