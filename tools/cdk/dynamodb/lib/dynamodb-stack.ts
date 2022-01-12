@@ -1,6 +1,6 @@
 import { Stack, StackProps, RemovalPolicy } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
-import { Vpc, SubnetType } from 'aws-cdk-lib/aws-ec2';
+import { Vpc, SubnetType  } from 'aws-cdk-lib/aws-ec2';
 import { Policy, PolicyStatement } from 'aws-cdk-lib/aws-iam';
 import * as lambda from 'aws-cdk-lib/aws-lambda';
 import { RetentionDays } from 'aws-cdk-lib/aws-logs';
@@ -27,14 +27,18 @@ export class DynamodbStack extends Stack {
     const dynamodb_policy = new PolicyStatement({
         actions: [
                 "dynamodb:BatchGetItem",
-				"dynamodb:GetItem",
+				"dynamodb:Get*",
 				"dynamodb:Query",
 				"dynamodb:Scan",
-				"dynamodb:BatchWriteItem",
+				"dynamodb:BatchWrite*",
 				"dynamodb:PutItem",
-				"dynamodb:UpdateItem"
+				"dynamodb:Update*",
+                "dynamodb:ListTables",
+                "dynamodb:DescribeStream",
+                "dynamodb.DescribeTable",
+                "dynamodb.CreateTable"
         ],
-        resources: ["arn:aws:dynamodb:us-east-1:111222333999:table:t123"],
+        resources: ["*"]
     });
 
     let fn = new lambda.DockerImageFunction(this, 'rust-dynamodb', {

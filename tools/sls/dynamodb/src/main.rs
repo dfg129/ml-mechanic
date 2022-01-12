@@ -19,7 +19,7 @@ async fn main() -> Result<(), Error> {
 }
 
 async fn handler(event: Value, _: Context) -> Result<Value, Error> {
-    let region_provider = RegionProviderChain::first_try(Region::new("us-east-1"));
+    let region_provider = RegionProviderChain::default_provider().or_else("us-east-1");
     println!("-----   Region secured  -----");
 
     let config = aws_config::from_env().region(region_provider).load().await;
