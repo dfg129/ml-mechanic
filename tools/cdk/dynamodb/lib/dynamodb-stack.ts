@@ -35,8 +35,8 @@ export class DynamodbStack extends Stack {
 				"dynamodb:Update*",
                 "dynamodb:ListTables",
                 "dynamodb:DescribeStream",
-                "dynamodb.DescribeTable",
-                "dynamodb.CreateTable"
+                "dynamodb:DescribeTable",
+                "dynamodb:CreateTable"
         ],
         resources: ["*"]
     });
