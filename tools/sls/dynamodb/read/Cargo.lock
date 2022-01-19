@@ -432,7 +432,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "dynamodb-write"
+name = "dynamodb-read"
 version = "0.1.0"
 dependencies = [
  "aws-config",
@@ -445,6 +445,7 @@ dependencies = [
  "serde_json",
  "time",
  "tokio",
+ "tracing",
  "tracing-subscriber 0.3.6",
 ]
 

@@ -61,7 +61,7 @@ let fn = new lambda.DockerImageFunction(this, 'dynamodb-create-table', {
             statements: [dynamodb_create_policy],
         }),
     );
-/**
+
     let fn2 = new lambda.DockerImageFunction(this, 'dynamodb-read-table', {
         description: 'Read from a dynamodb table',
         code: lambda.DockerImageCode.fromImageAsset(  path.join(docker_dir, '/read') ),
@@ -76,11 +76,11 @@ let fn = new lambda.DockerImageFunction(this, 'dynamodb-create-table', {
 
     fn2.role?.attachInlinePolicy(
         new Policy(this, 'dynamodb-read-policy', {
-            statements: [dynamodb-read-policy],
+            statements: [dynamodb_read_policy],
         }),
     );
 
-
+/*
     let fn3 = new lambda.DockerImageFunction(this, 'dynamodb-write-table', {
         description: 'Write into a dynamodb table',
         code: lambda.DockerImageCode.fromImageAsset( path.join(docker_dir, '/write' )),

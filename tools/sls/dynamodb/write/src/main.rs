@@ -1,6 +1,13 @@
-use lambda_runtime::handler_fn;
-use log::{debug, error, info};
+use aws_config::meta::region::RegionProviderChain;
+use lambda_runtime::{ handler_fn, Error };
+use log::{debug, info};
 use serde::{Serialize, Deserialize};
+// use serde_json::{ json, Value };
+use aws_sdk_dynamodb::model::{
+     AttributeValue
+};
+use aws_sdk_dynamodb::{ Client };
+//use std::process;
 
 #[derive(Deserialize)]
 struct Request {
@@ -30,6 +37,7 @@ type Response = Result<SuccessResponse, FailureResponse>;
 #[tokio::main]
 async fn main() -> Result<(), lambda_runtime::Error> {
     tracing_subscriber::fmt::init();
+    env_logger::init();
     debug!("logger is set up");
 
     let func = handler_fn(handler);
@@ -38,39 +46,38 @@ async fn main() -> Result<(), lambda_runtime::Error> {
     Ok(())
 }
 
+async fn add_item(
+    client: &Client,
+    table: &str,
+    username: &str,
+    p_type: &str,
+) -> Result<(), Error> {
+    let user_av = AttributeValue::S(username.into());
+    let type_av = AttributeValue::S(p_type.into());
+
+    let request = client
+        .put_item()
+        .table_name(table)
+        .item("justanotherkey", user_av);
+
+    request.send().await?;
+
+    println!(
+        "Added value {username}"
+    );
+
+    Ok(())
+}
+
 async fn  handler(req: Request, _ctx: lambda_runtime::Context) -> Response {
     info!("handle the request");
 
-    let bucket_name = std::env::var("BUCKET_NAME").expect("A BUCKET_NAME must be set");
+    let region_provider = RegionProviderChain::default_provider().or_else("us-east-1");
 
-    let config = aws_config::load_from_env().await;
-    let s3_client = aws_sdk_s3::Client::new(&config);
+    let config = aws_config::from_env().region(region_provider).load().await;
+    let client = Client::new(&config);
 
-   // let client = Client::new(&config);
-    let filename = format!("{}.txt", time::OffsetDateTime::now_utc().unix_timestamp());
-
-    let _ = s3_client
-        .put_object()
-        .bucket(bucket_name)
-        .body(req.body.as_bytes().to_owned().into())
-        .key(&filename)
-        .content_type("text/plani")
-        .send()
-        .await
-        .map_err(|err| {
-            error!(
-                "failed to upload file '{}' to s3 with error: {}",
-                &filename, err
-
-            );
-            FailureResponse {
-                body: "The lambda encountered trouble - you screwed".to_owned(),
-            }
-        })?;
-
-    info!(
-        "Successfully stored in {}", &&filename
-    );
+    add_item(&client, "newtable", "justanotherkey", "str");
 
     Ok(SuccessResponse {
         body: format!(
